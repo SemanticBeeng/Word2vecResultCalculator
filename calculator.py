@@ -9,33 +9,47 @@ gsWords = []
 word2VecResult = []
 averagePrecision = 0.0
 averageRecall = 0.0
+LEMMA_GS_WORD_COUNT = 0
 
-def calculate(suggestWords, gs_words, R):
+def seek(word, wordList):
+    indexValue = -1
+    try:
+        indexValue = wordList.index(word)
+    except:
+        pass
+    return indexValue
 
-    suggestWords = suggestWords[0:R]
+def calError(gsWords, resltWords, n):
+    xSum = 0
+
+    for i in range(LEMMA_GS_WORD_COUNT):
+        x = 0
+        if ( seek(gsWords[i], resltWords) < LEMMA_GS_WORD_COUNT ):
+            x = n;
+        else:
+            x = LEMMA_GS_WORD_COUNT - seek(gsWords[i], resltWords)
+            
+        xSum += x;
+
+
+    return 1.0 - ( float(xSum)/(n * LEMMA_GS_WORD_COUNT) );
+    
+
+def calculate(suggestWords, gs_words, kVal):
+
+    suggestWords = suggestWords[0:kVal]
     correctAnswers = 0
     G = len(gs_words)
 
     #print "Model Suggest Words: ", suggestWords
     #print "Golden Standard Words: ", gs_words
 
-    maxIndex=0
-    
     for word in gs_words:
         if(word in suggestWords):
             #print word,
             correctAnswers += 1
-            if ( maxIndex < suggestWords.index(word) ):
-                maxIndex = suggestWords.index(word)
-                
-    maxIndex += 1
-    den = 1
-    if(correctAnswers<G):
-        den = R
-    else:
-        den = maxIndex
     
-    precision = float(correctAnswers)/den
+    precision = 1.0 - calError(gs_words, suggestWords, kVal)
     recall = float(correctAnswers)/G
 
     '''print "\nmaxIndex", maxIndex
@@ -62,6 +76,9 @@ with open(Word2VecResultFile, 'rb') as f:
     for row in reader:
         word2VecResult.append(row)
 
+LEMMA_GS_WORD_COUNT = len(gsWords[0])
+resultTable = ""
+
 for kVal in kValues:
     for x in range(len(word2VecResult)):
         calculate([w.split(':')[0] for w in word2VecResult[x]], gsWords[x], kVal)
@@ -75,7 +92,9 @@ for kVal in kValues:
     #print "Average Precision: ",  "{:1.2f}".format( averagePrecision/len(word2VecResult) ) 
     #print "Average Recall: ", "{:1.2f}".format( averageRecall/len(word2VecResult) )
 
-    print "{:1.2f}".format( averagePrecision ), '&', "{:1.2f}".format( averageRecall ), '&', "{:1.2f}".format( (2*averagePrecision*averageRecall)/(averagePrecision+averageRecall) ), '&', 
+    resultTable += "{:1.2f}".format( averagePrecision ) + ' & ' + "{:1.2f}".format( averageRecall ) + ' & ' + "{:1.2f}".format( (2*averagePrecision*averageRecall)/(averagePrecision+averageRecall) ) + ' & '
 
     averagePrecision = 0
     averageRecall = 0
+
+print resultTable[:-3]
