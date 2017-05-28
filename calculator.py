@@ -4,7 +4,7 @@ import csv
 #Word2VecResultFile = 'Word2VecResult[LL].csv'
 Word2VecResultFile = 'Word2VecResult[G].csv'
 
-kValues = [5, 10, 20, 50, 100]
+kValues = [20, 50, 100, 200, 500]
 gsWords = []
 word2VecResult = []
 averagePrecision = 0.0
@@ -12,9 +12,9 @@ averageRecall = 0.0
 LEMMA_GS_WORD_COUNT = 0
 
 def seek(word, wordList):
-    indexValue = -1
+    indexValue = len(wordList)
     try:
-        indexValue = wordList.index(word)
+        indexValue = wordList.index(word) + 1
     except:
         pass
     return indexValue
@@ -27,13 +27,12 @@ def calError(gsWords, resltWords, n):
         if ( seek(gsWords[i], resltWords) < LEMMA_GS_WORD_COUNT ):
             x = n;
         else:
-            x = LEMMA_GS_WORD_COUNT - seek(gsWords[i], resltWords)
-            
+            x = ( float(n)/(n-LEMMA_GS_WORD_COUNT) ) * (n - seek(gsWords[i], resltWords))
+
         xSum += x;
 
-
     return 1.0 - ( float(xSum)/(n * LEMMA_GS_WORD_COUNT) );
-    
+
 
 def calculate(suggestWords, gs_words, kVal):
 
@@ -48,7 +47,7 @@ def calculate(suggestWords, gs_words, kVal):
         if(word in suggestWords):
             #print word,
             correctAnswers += 1
-    
+
     precision = 1.0 - calError(gs_words, suggestWords, kVal)
     recall = float(correctAnswers)/G
 
@@ -88,11 +87,15 @@ for kVal in kValues:
 
     averagePrecision = averagePrecision/len(word2VecResult)
     averageRecall = averageRecall/len(word2VecResult)
-    
-    #print "Average Precision: ",  "{:1.2f}".format( averagePrecision/len(word2VecResult) ) 
+
+    #print "Average Precision: ",  "{:1.2f}".format( averagePrecision/len(word2VecResult) )
     #print "Average Recall: ", "{:1.2f}".format( averageRecall/len(word2VecResult) )
 
-    resultTable += "{:1.2f}".format( averagePrecision ) + ' & ' + "{:1.2f}".format( averageRecall ) + ' & ' + "{:1.2f}".format( (2*averagePrecision*averageRecall)/(averagePrecision+averageRecall) ) + ' & '
+    F1 = 0.0
+    if ((averagePrecision+averageRecall) != 0):
+        F1 = (2*averagePrecision*averageRecall)/(averagePrecision+averageRecall)
+
+    resultTable += "{:1.2f}".format(averagePrecision) + ' & ' + "{:1.2f}".format(averageRecall) + ' & ' + "{:1.2f}".format(F1) + ' & '
 
     averagePrecision = 0
     averageRecall = 0
