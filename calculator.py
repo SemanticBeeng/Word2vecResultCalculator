@@ -25,13 +25,13 @@ def calError(gsWords, resltWords, n):
     for i in range(LEMMA_GS_WORD_COUNT):
         x = 0
         if ( seek(gsWords[i], resltWords) < LEMMA_GS_WORD_COUNT ):
-            x = n;
+            x = 1.0;
         else:
-            x = ( float(n)/(n-LEMMA_GS_WORD_COUNT) ) * (n - seek(gsWords[i], resltWords))
+            x = ( float(n - seek(gsWords[i], resltWords)) / (n-LEMMA_GS_WORD_COUNT) )
 
         xSum += x;
 
-    return 1.0 - ( float(xSum)/(n * LEMMA_GS_WORD_COUNT) );
+    return 1.0 - ( float(xSum)/LEMMA_GS_WORD_COUNT );
 
 
 def calculate(suggestWords, gs_words, kVal):
