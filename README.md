@@ -1,6 +1,10 @@
 ## How to run
 
-1. Run
+1. Compile<br><br>
     ```
-       ./run.sh <Word projections file in the BINARY FORMAT>
+    gcc -o distance distance.c -L/usr/include -lm
+    ```
+2. Run
+    ```
+    ./run.sh <Word projections file in the BINARY FORMAT>
     ```
