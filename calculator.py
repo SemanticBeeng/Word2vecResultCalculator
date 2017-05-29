@@ -10,6 +10,7 @@ word2VecResult = []
 averagePrecision = 0.0
 averageRecall = 0.0
 LEMMA_GS_WORD_COUNT = 0
+FLOAT_MINVALUE = 1.17549435E-38
 
 def seek(word, wordList):
     indexValue = len(wordList)
@@ -31,7 +32,7 @@ def calError(gsWords, resltWords, n):
 
         xSum += x;
 
-    return 1.0 - ( float(xSum)/LEMMA_GS_WORD_COUNT );
+    return 1.0 - ( (xSum+FLOAT_MINVALUE) / (correctAnswers+FLOAT_MINVALUE) );
 
 
 def calculate(suggestWords, gs_words, kVal):
